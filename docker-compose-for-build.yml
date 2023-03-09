@@ -1,0 +1,37 @@
+version: "3"
+services:
+  citus:
+    image: citusdata/citus:latest
+    networks:
+      - jwh-network
+  japonica-warehouse:
+    image: takahish/japonica-warehouse:citus-11.2
+    container_name: japonica-warehouse
+    restart: always
+    build:
+     context: ./
+     dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/jwh_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/jwh_password
+      POSTGRES_DB: jwh
+    ports:
+      - 5500:5432
+    volumes:
+      - ./warehouse:/var/lib/postgresql/data
+    networks:
+      - jwh-network
+    depends_on:
+      - citus
+    secrets:
+      - jwh_password
+      - jwh_user
+networks:
+  jwh-network:
+    driver: bridge
+secrets:
+   jwh_password:
+     file: sec/jwh_password.txt
+   jwh_user:
+     file: sec/jwh_user.txt
+

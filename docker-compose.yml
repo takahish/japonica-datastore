@@ -1,0 +1,42 @@
+version: "3"
+services:
+  japonica-warehouse:
+    image: takahish/japonica-warehouse:citus-11.2
+    container_name: japonica-warehouse
+    restart: always
+    environment:
+      POSTGRES_USER_FILE: /run/secrets/jwh_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/jwh_password
+      POSTGRES_DB: jwh
+    ports:
+      - 5500:5432
+    volumes:
+      - ./warehouse:/var/lib/postgresql/data
+    networks:
+      - jwh-network
+    secrets:
+      - jwh_password
+      - jwh_user
+  pgadmin:
+    image: dpage/pgadmin4:6.20
+    container_name: pgadmin
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@pgadmin.jp
+      PGADMIN_DEFAULT_PASSWORD: pgadmin
+    networks:
+      - jwh-network
+    depends_on:
+      - japonica-warehouse
+networks:
+  jwh-network:
+    driver: bridge
+secrets:
+   jwh_password:
+     file: sec/jwh_password.txt
+   jwh_user:
+     file: sec/jwh_user.txt
