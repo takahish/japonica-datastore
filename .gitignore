@@ -134,3 +134,7 @@ warehouse
 # The other data
 pgadmin
 
+# The data of query results
+data/query
+data/customer_reviews_1998.csv
+data/customer_reviews_1999.csv
